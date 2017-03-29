@@ -81,9 +81,6 @@ function AFSuccess(resolve, task: NSURLSessionDataTask, data: NSDictionary<strin
 			content = data
 		}
 
-		try {
-			content = JSON.parse(content)
-		} catch (e) { }
 
 	} else {
 		content = data
@@ -99,9 +96,6 @@ function AFFailure(resolve, reject, task: NSURLSessionDataTask, error: NSError) 
 	// console.log('error.localizedDescription', error.localizedDescription)
 	let data: NSData = error.userInfo.valueForKey(AFNetworkingOperationFailingURLResponseDataErrorKey)
 	let body = NSString.alloc().initWithDataEncoding(data, NSUTF8StringEncoding).toString()
-	try {
-		body = JSON.parse(body)
-	} catch (e) { }
 	let content: any = {
 		body,
 		description: error.description,

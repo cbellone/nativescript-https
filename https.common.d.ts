@@ -11,16 +11,12 @@ export interface HttpsSSLPinningOptions {
 	validatesDomainName?: boolean
 }
 
-export interface HttpsRequestObject {
-	[key: string]: string | number
-}
-
 export interface HttpsRequestOptions {
 	url: string
 	method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD'
 	headers?: Headers
 	params?: HttpsRequestObject
-	body?: HttpsRequestObject
+	body?: any
 }
 
 export interface HttpsResponse {

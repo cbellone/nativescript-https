@@ -40,10 +40,6 @@ function AFSuccess(resolve, task, data) {
         else {
             content = data;
         }
-        try {
-            content = JSON.parse(content);
-        }
-        catch (e) { }
     }
     else {
         content = data;
@@ -53,10 +49,6 @@ function AFSuccess(resolve, task, data) {
 function AFFailure(resolve, reject, task, error) {
     var data = error.userInfo.valueForKey(AFNetworkingOperationFailingURLResponseDataErrorKey);
     var body = NSString.alloc().initWithDataEncoding(data, NSUTF8StringEncoding).toString();
-    try {
-        body = JSON.parse(body);
-    }
-    catch (e) { }
     var content = {
         body: body,
         description: error.description,
