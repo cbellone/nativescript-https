@@ -201,7 +201,9 @@ export function request(opts: Https.HttpsRequestOptions): Promise<Https.HttpsRes
 			} else {
 				let type = <string>opts.headers['Content-Type'] || 'application/json'
 				let body = <any>opts.body || {}
-				
+				try {
+					body = JSON.stringify(body)
+				} catch (e) { }
 				request[methods[opts.method]](okhttp3.RequestBody.create(
 					okhttp3.MediaType.parse(type),
 					body
@@ -235,7 +237,7 @@ export function request(opts: Https.HttpsRequestOptions): Promise<Https.HttpsRes
 					// }
 
 					let content = response.body().string()
-					
+
 					let statusCode = response.code()
 
 					let headers = {}

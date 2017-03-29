@@ -135,6 +135,10 @@ function request(opts) {
             else {
                 var type = opts.headers['Content-Type'] || 'application/json';
                 var body = opts.body || {};
+                try {
+                    body = JSON.stringify(body);
+                }
+                catch (e) { }
                 request_1[methods[opts.method]](okhttp3.RequestBody.create(okhttp3.MediaType.parse(type), body));
             }
             android.os.StrictMode.setThreadPolicy(strictModeThreadPolicyPermitAll);
