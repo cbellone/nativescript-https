@@ -135,20 +135,12 @@ function request(opts) {
             else {
                 var type = opts.headers['Content-Type'] || 'application/json';
                 var body = opts.body || {};
-                try {
-                    body = JSON.stringify(body);
-                }
-                catch (e) { }
                 request_1[methods[opts.method]](okhttp3.RequestBody.create(okhttp3.MediaType.parse(type), body));
             }
             android.os.StrictMode.setThreadPolicy(strictModeThreadPolicyPermitAll);
             client.newCall(request_1.build()).enqueue(new okhttp3.Callback({
                 onResponse: function (task, response) {
                     var content = response.body().string();
-                    try {
-                        content = JSON.parse(content);
-                    }
-                    catch (e) { }
                     var statusCode = response.code();
                     var headers = {};
                     var heads = response.headers();
