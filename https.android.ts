@@ -106,37 +106,40 @@ function getClient(reload: boolean = false): okhttp3.OkHttpClient {
 			client.certificatePinner(pinner.build())
 
 			if (peer.allowInvalidCertificates == false) {
-				try {
+				try {		
 					let x509Certificate = peer.x509Certificate
 					let keyStore = java.security.KeyStore.getInstance(
 						java.security.KeyStore.getDefaultType()
 					)
 					keyStore.load(null, null)
-					// keyStore.setCertificateEntry(peer.host, x509Certificate)
-					keyStore.setCertificateEntry('CA', x509Certificate)
-
-					// let keyManagerFactory = javax.net.ssl.KeyManagerFactory.getInstance(
-					// 	javax.net.ssl.KeyManagerFactory.getDefaultAlgorithm()
-					// )
-					let keyManagerFactory = javax.net.ssl.KeyManagerFactory.getInstance('X509')
+					keyStore.setCertificateEntry(peer.host, x509Certificate)
+					let keyManagerFactory = javax.net.ssl.KeyManagerFactory.getInstance(javax.net.ssl.KeyManagerFactory.getDefaultAlgorithm())
 					keyManagerFactory.init(keyStore, null)
-					let keyManagers = keyManagerFactory.getKeyManagers()
+					
+					let trustManagerFactory = javax.net.ssl.TrustManagerFactory.getInstance(javax.net.ssl.TrustManagerFactory.getDefaultAlgorithm());
+					trustManagerFactory.init(keyStore);
 
-					let trustManagerFactory = javax.net.ssl.TrustManagerFactory.getInstance(
-						javax.net.ssl.TrustManagerFactory.getDefaultAlgorithm()
-					)
-					trustManagerFactory.init(keyStore)
-
+					let trustManagers = trustManagerFactory.getTrustManagers();
 					let sslContext = javax.net.ssl.SSLContext.getInstance('TLS')
-					sslContext.init(keyManagers, trustManagerFactory.getTrustManagers(), new java.security.SecureRandom())
-					client.sslSocketFactory(sslContext.getSocketFactory())
-
+					sslContext.init(null, trustManagers, new java.security.SecureRandom())
+					client.sslSocketFactory(sslContext.getSocketFactory(), <javax.net.ssl.IX509TrustManager>trustManagers[0]);
 				} catch (error) {
 					console.error('nativescript-https > client.allowInvalidCertificates error', error)
 				}
 			}
 
-			if (peer.validatesDomainName == true) {
+			if (peer.validatesDomainName == false) {
+				try {
+					client.hostnameVerifier(new javax.net.ssl.HostnameVerifier({
+						verify: function(hostname: string, session: javax.net.ssl.ISSLSession): boolean {
+							console.log(`verifying ${hostname}`);
+							return true;
+						},
+					}))
+				} catch (error) {
+					console.error('nativescript-https > client.validatesDomainName error', error)
+				}
+			} else {
 				try {
 					client.hostnameVerifier(new javax.net.ssl.HostnameVerifier({
 						verify: function(hostname: string, session: javax.net.ssl.ISSLSession): boolean {

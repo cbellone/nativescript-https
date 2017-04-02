@@ -68,21 +68,34 @@ function getClient(reload) {
                     var x509Certificate = peer.x509Certificate;
                     var keyStore = java.security.KeyStore.getInstance(java.security.KeyStore.getDefaultType());
                     keyStore.load(null, null);
-                    keyStore.setCertificateEntry('CA', x509Certificate);
-                    var keyManagerFactory = javax.net.ssl.KeyManagerFactory.getInstance('X509');
+                    keyStore.setCertificateEntry(peer.host, x509Certificate);
+                    var keyManagerFactory = javax.net.ssl.KeyManagerFactory.getInstance(javax.net.ssl.KeyManagerFactory.getDefaultAlgorithm());
                     keyManagerFactory.init(keyStore, null);
-                    var keyManagers = keyManagerFactory.getKeyManagers();
                     var trustManagerFactory = javax.net.ssl.TrustManagerFactory.getInstance(javax.net.ssl.TrustManagerFactory.getDefaultAlgorithm());
                     trustManagerFactory.init(keyStore);
+                    var trustManagers = trustManagerFactory.getTrustManagers();
                     var sslContext = javax.net.ssl.SSLContext.getInstance('TLS');
-                    sslContext.init(keyManagers, trustManagerFactory.getTrustManagers(), new java.security.SecureRandom());
-                    client.sslSocketFactory(sslContext.getSocketFactory());
+                    sslContext.init(null, trustManagers, new java.security.SecureRandom());
+                    client.sslSocketFactory(sslContext.getSocketFactory(), trustManagers[0]);
                 }
                 catch (error) {
                     console.error('nativescript-https > client.allowInvalidCertificates error', error);
                 }
             }
-            if (peer.validatesDomainName == true) {
+            if (peer.validatesDomainName == false) {
+                try {
+                    client.hostnameVerifier(new javax.net.ssl.HostnameVerifier({
+                        verify: function (hostname, session) {
+                            console.log("verifying " + hostname);
+                            return true;
+                        },
+                    }));
+                }
+                catch (error) {
+                    console.error('nativescript-https > client.validatesDomainName error', error);
+                }
+            }
+            else {
                 try {
                     client.hostnameVerifier(new javax.net.ssl.HostnameVerifier({
                         verify: function (hostname, session) {
