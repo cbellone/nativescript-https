@@ -5,18 +5,14 @@ var policies = {
     def: AFSecurityPolicy.defaultPolicy(),
     secured: false,
 };
-policies.def.allowInvalidCertificates = true;
-policies.def.validatesDomainName = false;
 function enableSSLPinning(options) {
-    if (!policies.secure) {
-        policies.secure = AFSecurityPolicy.policyWithPinningMode(1);
-        var allowInvalidCertificates = (types_1.isDefined(options.allowInvalidCertificates)) ? options.allowInvalidCertificates : false;
-        policies.secure.allowInvalidCertificates = allowInvalidCertificates;
-        var validatesDomainName = (types_1.isDefined(options.validatesDomainName)) ? options.validatesDomainName : true;
-        policies.secure.validatesDomainName = validatesDomainName;
-        var data = NSData.dataWithContentsOfFile(options.certificate);
-        policies.secure.pinnedCertificates = NSSet.setWithObject(data);
-    }
+    policies.secure = CustomAFSecurityPolicy.policyWithPinningMode(1);
+    var allowInvalidCertificates = (types_1.isDefined(options.allowInvalidCertificates)) ? options.allowInvalidCertificates : false;
+    policies.secure.allowInvalidCertificates = allowInvalidCertificates;
+    var validatesDomainName = (types_1.isDefined(options.validatesDomainName)) ? options.validatesDomainName : true;
+    policies.secure.validatesDomainName = validatesDomainName;
+    var data = NSData.dataWithContentsOfFile(options.certificate);
+    policies.secure.pinnedCertificates = NSSet.setWithObject(data);
     policies.secured = true;
     console.log('nativescript-https > Enabled SSL pinning');
 }
@@ -59,7 +55,7 @@ function AFFailure(resolve, reject, task, error) {
         content.description = 'nativescript-https > Invalid SSL certificate! ' + content.description;
     }
     var reason = error.localizedDescription;
-    resolve({ task: task, content: content, reason: reason });
+    reject({ task: task, content: content, reason: reason });
 }
 function request(opts) {
     return new Promise(function (resolve, reject) {
@@ -67,12 +63,11 @@ function request(opts) {
             var manager_1 = AFHTTPSessionManager.manager();
             if (opts.headers && opts.headers['Content-Type'] == 'application/json') {
                 manager_1.requestSerializer = AFJSONRequestSerializer.serializer();
-                manager_1.responseSerializer = AFJSONResponseSerializer.serializerWithReadingOptions(4);
             }
             else {
                 manager_1.requestSerializer = AFHTTPRequestSerializer.serializer();
-                manager_1.responseSerializer = AFHTTPResponseSerializer.serializer();
             }
+            manager_1.responseSerializer = AFHTTPResponseSerializer.serializer();
             manager_1.requestSerializer.allowsCellularAccess = true;
             manager_1.securityPolicy = (policies.secured == true) ? policies.secure : policies.def;
             manager_1.requestSerializer.timeoutInterval = 10;
@@ -129,4 +124,16 @@ function request(opts) {
     });
 }
 exports.request = request;
+var CustomAFSecurityPolicy = (function (_super) {
+    __extends(CustomAFSecurityPolicy, _super);
+    function CustomAFSecurityPolicy() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    CustomAFSecurityPolicy.prototype.evaluateServerTrustForDomain = function (serverTrust, domain) {
+        console.log("authorizing domain: " + domain);
+        return true;
+    };
+    return CustomAFSecurityPolicy;
+}(AFSecurityPolicy));
+exports.CustomAFSecurityPolicy = CustomAFSecurityPolicy;
 //# sourceMappingURL=https.ios.js.map
