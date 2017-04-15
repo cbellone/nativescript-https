@@ -118,15 +118,15 @@ exports.request = request;
 function serializeBody(body, isJSON) {
     if (body) {
         if (body.constructor === Array && isJSON) {
-            var arr = NSArray.new();
+            var arr_1 = NSMutableArray.new();
             body.forEach(function (e) {
                 var dict = NSMutableDictionary.new();
                 Object.keys(e).forEach(function (key) {
                     dict.setValueForKey(e[key], key);
                 });
-                return dict;
+                arr_1.addObject(dict);
             });
-            return arr;
+            return arr_1;
         }
         else if (types_1.isObject(body)) {
             var dict_1 = NSMutableDictionary.new();

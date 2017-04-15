@@ -145,13 +145,13 @@ export function request(opts: Https.HttpsRequestOptions): Promise<Https.HttpsRes
 function serializeBody(body: any, isJSON: boolean) {
 	if (body) {
 		if(body.constructor === Array && isJSON) {
-			let arr = NSArray.new<any>();
+			let arr = NSMutableArray.new<any>();
 			(<Array<any>>body).forEach(e => {
 				let dict = NSMutableDictionary.new<string, any>()
 				Object.keys(e).forEach(function(key) {
 					dict.setValueForKey(e[key] as any, key)
 				})
-				return dict;
+				arr.addObject(dict);
 			});
 			return arr;
 		} else if (isObject(body)) {
