@@ -61,7 +61,8 @@ function request(opts) {
     return new Promise(function (resolve, reject) {
         try {
             var manager_1 = AFHTTPSessionManager.manager();
-            if (opts.headers && opts.headers['Content-Type'] == 'application/json') {
+            var cTypeJSON = opts.headers && opts.headers['Content-Type'] == 'application/json';
+            if (cTypeJSON) {
                 manager_1.requestSerializer = AFJSONRequestSerializer.serializer();
             }
             else {
@@ -77,16 +78,6 @@ function request(opts) {
                     manager_1.requestSerializer.setValueForHTTPHeaderField(heads_1[key], key);
                 });
             }
-            var dict_1 = null;
-            if (opts.body) {
-                var cont_1 = opts.body;
-                if (types_1.isObject(cont_1)) {
-                    dict_1 = NSMutableDictionary.new();
-                    Object.keys(cont_1).forEach(function (key) {
-                        dict_1.setValueForKey(cont_1[key], key);
-                    });
-                }
-            }
             var methods = {
                 'GET': 'GETParametersSuccessFailure',
                 'POST': 'POSTParametersSuccessFailure',
@@ -95,7 +86,7 @@ function request(opts) {
                 'PATCH': 'PATCHParametersSuccessFailure',
                 'HEAD': 'HEADParametersSuccessFailure',
             };
-            manager_1[methods[opts.method]](opts.url, dict_1, function success(task, data) {
+            manager_1[methods[opts.method]](opts.url, serializeBody(opts.body, cTypeJSON), function success(task, data) {
                 AFSuccess(resolve, task, data);
             }, function failure(task, error) {
                 AFFailure(resolve, reject, task, error);
@@ -124,6 +115,29 @@ function request(opts) {
     });
 }
 exports.request = request;
+function serializeBody(body, isJSON) {
+    if (body) {
+        if (body.constructor === Array && isJSON) {
+            var arr = NSArray.new();
+            body.forEach(function (e) {
+                var dict = NSMutableDictionary.new();
+                Object.keys(body).forEach(function (key) {
+                    dict.setValueForKey(body[key], key);
+                });
+                return dict;
+            });
+            return arr;
+        }
+        else if (types_1.isObject(body)) {
+            var dict_1 = NSMutableDictionary.new();
+            Object.keys(body).forEach(function (key) {
+                dict_1.setValueForKey(body[key], key);
+            });
+            return dict_1;
+        }
+    }
+    return null;
+}
 var CustomAFSecurityPolicy = (function (_super) {
     __extends(CustomAFSecurityPolicy, _super);
     function CustomAFSecurityPolicy() {

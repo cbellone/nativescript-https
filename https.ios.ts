@@ -77,8 +77,8 @@ export function request(opts: Https.HttpsRequestOptions): Promise<Https.HttpsRes
 		try {
 
 			let manager = AFHTTPSessionManager.manager()
-
-			if (opts.headers && opts.headers['Content-Type'] == 'application/json') {
+			let cTypeJSON = opts.headers && opts.headers['Content-Type'] == 'application/json';
+			if (cTypeJSON) {
 				manager.requestSerializer = AFJSONRequestSerializer.serializer()
 			} else {
 				manager.requestSerializer = AFHTTPRequestSerializer.serializer()
@@ -95,17 +95,6 @@ export function request(opts: Https.HttpsRequestOptions): Promise<Https.HttpsRes
 				})
 			}
 
-			let dict: NSMutableDictionary<string, any> = null
-			if (opts.body) {
-				let cont = opts.body
-				if (isObject(cont)) {
-					dict = NSMutableDictionary.new<string, any>()
-					Object.keys(cont).forEach(function(key) {
-						dict.setValueForKey(cont[key] as any, key)
-					})
-				}
-			}
-
 			let methods = {
 				'GET': 'GETParametersSuccessFailure',
 				'POST': 'POSTParametersSuccessFailure',
@@ -114,7 +103,7 @@ export function request(opts: Https.HttpsRequestOptions): Promise<Https.HttpsRes
 				'PATCH': 'PATCHParametersSuccessFailure',
 				'HEAD': 'HEADParametersSuccessFailure',
 			}
-			manager[methods[opts.method]](opts.url, dict, function success(task: NSURLSessionDataTask, data: any) {
+			manager[methods[opts.method]](opts.url, serializeBody(opts.body, cTypeJSON), function success(task: NSURLSessionDataTask, data: any) {
 				AFSuccess(resolve, task, data)
 			}, function failure(task, error) {
 				AFFailure(resolve, reject, task, error)
@@ -151,6 +140,29 @@ export function request(opts: Https.HttpsRequestOptions): Promise<Https.HttpsRes
 
 	})
 
+}
+
+function serializeBody(body: any, isJSON: boolean) {
+	if (body) {
+		if(body.constructor === Array && isJSON) {
+			let arr = NSArray.new<any>();
+			(<Array<any>>body).forEach(e => {
+				let dict = NSMutableDictionary.new<string, any>()
+				Object.keys(body).forEach(function(key) {
+					dict.setValueForKey(body[key] as any, key)
+				})
+				return dict;
+			});
+			return arr;
+		} else if (isObject(body)) {
+			let dict = NSMutableDictionary.new<string, any>()
+			Object.keys(body).forEach(function(key) {
+				dict.setValueForKey(body[key] as any, key)
+			})
+			return dict;
+		}
+	}
+	return null;
 }
 
 export class CustomAFSecurityPolicy extends AFSecurityPolicy {
