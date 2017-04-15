@@ -121,8 +121,8 @@ function serializeBody(body, isJSON) {
             var arr = NSArray.new();
             body.forEach(function (e) {
                 var dict = NSMutableDictionary.new();
-                Object.keys(body).forEach(function (key) {
-                    dict.setValueForKey(body[key], key);
+                Object.keys(e).forEach(function (key) {
+                    dict.setValueForKey(e[key], key);
                 });
                 return dict;
             });
