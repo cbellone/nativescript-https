@@ -43,7 +43,7 @@ function AFSuccess(resolve, task: NSURLSessionDataTask, data: NSDictionary<strin
 			let serial = NSJSONSerialization.dataWithJSONObjectOptionsError(data, NSJSONWritingOptions.PrettyPrinted)
 			content = NSString.alloc().initWithDataEncoding(serial, NSUTF8StringEncoding).toString()
 		} else if (data.class().name == 'NSData') {
-			content = NSString.alloc().initWithDataEncoding(data, NSASCIIStringEncoding).toString()
+			content = NSString.alloc().initWithDataEncoding(data, NSUTF8StringEncoding).toString()
 		} else {
 			content = data
 		}

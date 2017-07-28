@@ -31,7 +31,7 @@ function AFSuccess(resolve, task, data) {
             content = NSString.alloc().initWithDataEncoding(serial, NSUTF8StringEncoding).toString();
         }
         else if (data.class().name == 'NSData') {
-            content = NSString.alloc().initWithDataEncoding(data, NSASCIIStringEncoding).toString();
+            content = NSString.alloc().initWithDataEncoding(data, NSUTF8StringEncoding).toString();
         }
         else {
             content = data;
