@@ -1,3 +1,4 @@
+export module AFNetworking {
 
 declare class AFAutoPurgingImageCache extends NSObject implements AFImageRequestCache {
 
@@ -804,3 +805,4 @@ declare class AFXMLParserResponseSerializer extends AFHTTPResponseSerializer {
 declare var kAFUploadStream3GSuggestedDelay: number;
 
 declare var kAFUploadStream3GSuggestedPacketSize: number;
+}
