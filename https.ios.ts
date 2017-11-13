@@ -1,4 +1,4 @@
-// 
+//
 
 import * as application from 'application'
 import { HttpRequestOptions, Headers, HttpResponse } from 'http'
@@ -69,7 +69,7 @@ function AFFailure(resolve, reject, task: NSURLSessionDataTask, error: NSError) 
 		content.description = 'nativescript-https > Invalid SSL certificate! ' + content.description
 	}
 	let reason = error.localizedDescription
-	reject({ task, content, reason })
+	resolve({ task, body, reason })
 }
 
 export function request(opts: Https.HttpsRequestOptions): Promise<Https.HttpsResponse> {

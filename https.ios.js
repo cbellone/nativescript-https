@@ -51,11 +51,12 @@ function AFFailure(resolve, reject, task, error) {
         reason: error.localizedDescription,
         url: error.userInfo.objectForKey('NSErrorFailingURLKey').description
     };
+
     if (policies.secured == true) {
         content.description = 'nativescript-https > Invalid SSL certificate! ' + content.description;
     }
     var reason = error.localizedDescription;
-    reject({ task: task, content: content, reason: reason });
+    resolve({ task: task, content: body, reason: reason });
 }
 function request(opts) {
     return new Promise(function (resolve, reject) {
