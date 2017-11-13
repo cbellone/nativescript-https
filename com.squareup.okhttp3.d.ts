@@ -1,3 +1,4 @@
+export module okhttp3 {
 
 declare module okhttp3 {
 	export class Address extends java.lang.Object {
@@ -3047,4 +3048,5 @@ declare module org {
 			}
 		}
 	}
+}
 }
